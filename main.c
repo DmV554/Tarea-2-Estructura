@@ -32,7 +32,9 @@ typedef struct {
 void crearPerfil(Map *, Jugador*);
 void mostrarPerfilJugador(Map *);
 void mostrarInventario(List *);
-
+void agregarItemJugador(Map*);
+Jugador* existeJugador(Map*);
+void insertarAccion(Stack*, char*, char*);
 /*
   función para comparar claves de tipo string
   retorna 1 si son iguales
@@ -108,7 +110,7 @@ int main() {
         break;
 
       case 3:  
-        
+        agregarItemJugador(mapaJugadores);
         break;
 
       case 4:
@@ -202,4 +204,53 @@ void mostrarInventario(List *inventario){
       itemNodo = nextList(inventario);
     }
   }
+}
+
+Jugador* existeJugador(Map*mapaJugadores) {
+  char nombre[51];
+
+  printf("INGRESE NOMBRE JUGADOR A BUSCAR: ");
+  scanf("%50[^\n]s", nombre);
+  getchar();
+
+  Jugador* jugadorBuscado = searchMap(mapaJugadores, nombre);
+  if(jugadorBuscado == NULL) {
+    printf("El jugador %s no existe", nombre);
+    return NULL;
+  }
+
+  return jugadorBuscado;
+  
+}
+
+void agregarItemJugador(Map*mapaJugadores) {
+  Jugador *jugadorBuscado = existeJugador(mapaJugadores);
+  if(jugadorBuscado == NULL) return;
+  
+    char nombreItem[51];
+
+    printf("\nINGRESE ITEM: ");
+    scanf("%50[^\n]s", nombreItem);
+    getchar();
+
+    Item *itemNodo = malloc(sizeof(Item));
+    if(itemNodo == NULL) exit(EXIT_FAILURE);
+
+    strcpy(itemNodo->nombre, nombreItem);
+    pushBack(jugadorBuscado->inventario, itemNodo);
+
+    printf("\nITEM INGRESADO CON ÉXITO\n");
+
+    insertarAccion(jugadorBuscado->pilaAcciones, "agregar", nombreItem);
+
+}
+
+void insertarAccion(Stack*pilaAcciones, char*accion, char*nombreItem) {
+  Accion*nodoAccion = malloc(sizeof(Accion));
+
+  strcpy(nodoAccion->nombreAccion, accion);
+  strcpy(nodoAccion->item, nombreItem);
+
+  stack_push(pilaAcciones, nodoAccion);
+
 }
