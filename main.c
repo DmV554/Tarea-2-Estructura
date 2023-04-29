@@ -35,7 +35,7 @@ void mostrarInventario(List *);
 void agregarItemJugador(Map*, Map*);
 Jugador* existeJugador(Map*);
 void insertarAccion(Stack*, char*, char*);
-void eliminarItemJugador(Map *);
+void eliminarItemJugador(Map *, Map*);
 Item *buscarItem(List *, char *);
 void agregarPuntosJugador(Map*);
 void insertarAccionPuntaje(Stack*, char*, int);
@@ -117,9 +117,8 @@ int main() {
       case 1:
         jugador = (Jugador*)malloc(sizeof(Jugador));
         crearPerfil(mapaJugadores, jugador);
-        
         break;
-        
+
       case 2:
         mostrarPerfilJugador(mapaJugadores);
         break;
@@ -129,7 +128,7 @@ int main() {
         break;
 
       case 4:
-        eliminarItemJugador(mapaJugadores);
+        eliminarItemJugador(mapaJugadores, mapaItems);
         break;
 
       case 5:
@@ -223,6 +222,7 @@ void mostrarInventario(List *inventario){
   }
 }
 
+//Se comprueba de que el jugador exista en el mapaJugadores mediante la funcion searchMap.
 Jugador* existeJugador(Map*mapaJugadores) {
   char nombre[51];
 
@@ -308,7 +308,7 @@ void insertarAccion(Stack*pilaAcciones, char*accion, char*nombreItem) {
 
 /*Para eliminar el item en el perfil del jugador, le pasamos el Mapa de jugadores y el Mapa de items, 
 para después preguntar si el item existe en el inventario del jugador buscado o no.*/
-void eliminarItemJugador(Map *mapaJugadores) {
+void eliminarItemJugador(Map *mapaJugadores, Map* mapaItems) {
   char nombreItem[51];
 
   Jugador*jugadorBuscado = existeJugador(mapaJugadores);
@@ -328,6 +328,7 @@ void eliminarItemJugador(Map *mapaJugadores) {
   } else {
     insertarAccion(jugadorBuscado->pilaAcciones, "eliminar", nombreItem);
     popCurrent(jugadorBuscado->inventario);
+    eliminarJugadorListaItemMapa(jugadorBuscado, nombreItem, mapaItems);
   }
 }
 
