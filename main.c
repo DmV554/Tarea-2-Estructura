@@ -32,7 +32,7 @@ typedef struct {
 void crearPerfil(Map *, Jugador*);
 void mostrarPerfilJugador(Map *);
 void mostrarInventario(List *);
-void agregarItemJugador(Map*);
+void agregarItemJugador(Map*, Map*);
 Jugador* existeJugador(Map*);
 void insertarAccion(Stack*, char*, char*);
 void eliminarItemJugador(Map *);
@@ -117,7 +117,7 @@ int main() {
         break;
 
       case 3:  
-        agregarItemJugador(mapaJugadores);
+        agregarItemJugador(mapaJugadores, mapaItems);
         break;
 
       case 4:
@@ -230,7 +230,8 @@ Jugador* existeJugador(Map*mapaJugadores) {
   
 }
 
-void agregarItemJugador(Map*mapaJugadores) {
+void agregarItemJugador(Map*mapaJugadores, Map *mapaItems) {
+  ItemMapa *itemMNodo;
   Jugador *jugadorBuscado = existeJugador(mapaJugadores);
   if(jugadorBuscado == NULL) return;
   
@@ -249,6 +250,34 @@ void agregarItemJugador(Map*mapaJugadores) {
     printf("\nITEM INGRESADO CON ÉXITO\n");
 
     insertarAccion(jugadorBuscado->pilaAcciones, "agregar", nombreItem);
+    //busca si existe el item en el mapaItems, si no está crea la lista para ese item. Si no, se traspasa el item buscado a la itemMnodo
+    ItemMapa *itemBuscado = searchMap(mapaItems, nombreItem);
+  
+    if(itemBuscado == NULL) {
+      itemMNodo = (ItemMapa*) malloc(sizeof(ItemMapa));      
+      itemMNodo->listaJugadoresConItem = createList();
+      
+    } else {
+      itemMNodo = itemBuscado;
+
+      //Se verifica que el jugador tenga el item en su inventario
+      Item*itemBuscado = buscarItem(jugadorBuscado->inventario, nombreItem);
+      //Si existe se verifica de que el jugador no exista en la lista de jugadores del mapa de items. Si ya existe, no se hace nada, si no, se agrega el jugador a la lista de jugadores del mapa del item.
+      if(itemBuscado != NULL) {
+        if(existeJugadorLista(itemMNodo->listaJugadoresConItem, jugadorBuscado->nombre)) {
+          return;
+        }
+
+        pushBack(itemMNodo->listaJugadoresConItem, jugadorBuscado);
+        return;
+        
+      }
+      
+    }
+    //Se le traspasa el nombreItem al itemMNodo y luego se
+    strcpy(itemMNodo->nombre, nombreItem);
+    //En el caso de que no existiera el item en el mapa de items, se agrega el item al mapa de items.
+    insertarItemMapa(jugadorBuscado, nombreItem, mapaItems, itemMNodo);
 
 }
 
