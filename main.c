@@ -47,6 +47,7 @@ void insertarItemMapa(Jugador*, char*, Map*, ItemMapa*);
 void deshacerUltimaAccion(Map*);
 void exportarDatosJugadores(Map*);
 void importarDatosJugadores(Map*, Map*);
+void insertarItemMapaArchivo(Map*, char*, Jugador*);
 
 /*
   función para comparar claves de tipo string
@@ -588,4 +589,35 @@ void importarDatosJugadores(Map*mapaJugadores, Map*mapaItems) {
 
   fclose(archivoJugadores);
 
+}
+
+// Se usa el mismo metodo para agregar el item en en el mapaItems de la funcion AgregarItem. 
+void insertarItemMapaArchivo(Map* mapaItems, char*nombreItem, Jugador*jugadorBuscado) {
+  ItemMapa*itemMNodo;
+  
+  ItemMapa *itemBuscado = searchMap(mapaItems, nombreItem);
+  
+    if(itemBuscado == NULL) {
+      itemMNodo = (ItemMapa*)malloc(sizeof(ItemMapa));      
+      itemMNodo->listaJugadoresConItem = createList();
+      
+    } else {
+      itemMNodo = itemBuscado;
+
+      Item*itemBuscado = buscarItem(jugadorBuscado->inventario, nombreItem);
+      if(itemBuscado != NULL) {
+        
+        if(existeJugadorLista(itemMNodo->listaJugadoresConItem, jugadorBuscado->nombre)) {
+          return;
+        }
+
+        pushBack(itemMNodo->listaJugadoresConItem, jugadorBuscado);
+        return;
+        
+      }
+      
+    }
+
+    strcpy(itemMNodo->nombre, nombreItem);
+    insertarItemMapa(jugadorBuscado, nombreItem, mapaItems, itemMNodo);
 }
