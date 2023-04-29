@@ -90,9 +90,9 @@ int main() {
   char opcion[11];
   bool ejecucion = true;
 
-   Map *mapaJugadores = createMap(is_equal_string);
-   Jugador *jugador;
-   Map *mapaItems = createMap(is_equal_string);
+  Map *mapaJugadores = createMap(is_equal_string);
+  Jugador *jugador;
+  Map *mapaItems = createMap(is_equal_string);
 
   while (ejecucion) {
     printf("\n1.-CREAR PERFIL JUGADOR\n");
@@ -177,15 +177,13 @@ void crearPerfil(Map *mapaJugadores, Jugador* jugador) {
   scanf("%50[^\n]s", jugador->nombre);
   getchar();
 
- Jugador* jugadorBuscado = searchMap(mapaJugadores, jugador->nombre);
+  Jugador* jugadorBuscado = searchMap(mapaJugadores, jugador->nombre);
   if(jugadorBuscado != NULL) {
     printf("\nEl jugador %s ya existe\n\n", jugador->nombre);
     return;
   }
   
-
   jugador->puntosHabilidad = 0;
-  
   jugador->inventario = createList();
   jugador->pilaAcciones = stack_create();
   
@@ -194,7 +192,8 @@ void crearPerfil(Map *mapaJugadores, Jugador* jugador) {
   printf("\nJUGADOR CREADO CON ÉXITO\n");
 }
 
-//Primero se comprueba si existe el jugador dentro del mapa de jugadores. Se muestra el nombre y los puntos de habilidad y luego se muestra el inventario a través de la función mostrar inventario
+/*Primero se comprueba si existe el jugador dentro del mapa de jugadores. Se muestra el 
+nombre y los puntos de habilidad y luego se muestra el inventario a través de la función mostrar inventario*/
 void mostrarPerfilJugador(Map *mapaJugadores) {
   Jugador* jugadorBuscado = existeJugador(mapaJugadores);
 
@@ -205,11 +204,11 @@ void mostrarPerfilJugador(Map *mapaJugadores) {
   
   mostrarInventario(jugadorBuscado->inventario);
   printf("\n\n");
-  
-
 }
 
-//Se crea un puntero al princio de la lista del inventario para comenzar la busqueda. Si es null significa que la lista está vacía. Si no, muestra la lista de todos los items recorriendo la lista.
+/*Se crea un puntero al princio de la lista del inventario para comenzar la busqueda. 
+Si es null significa que la lista está vacía. Si no, muestra la lista de todos los items 
+recorriendo la lista.*/
 void mostrarInventario(List *inventario){
   Item *itemNodo = firstList(inventario);
 
@@ -238,14 +237,13 @@ Jugador* existeJugador(Map*mapaJugadores) {
   }
 
   return jugadorBuscado;
-  
 }
 
 /*Para agregar el item al jugador se le traspasa el mapa de jugadores y el mapa de items. 
 Se verifica de que el jugador exista, se le reserva memoria al nodo del item nuevo y se copia 
 el nombreItem al nodo del item nodo. Luego se agrega al final de la lista del inventario del jugador
- el nodo del item agregado. Luego guardamos en la pila de acciones "agregar" ya que es la acción que
-  se acaba de realizar.*/
+el nodo del item agregado. Luego guardamos en la pila de acciones "agregar" ya que es la acción que
+se acaba de realizar.*/
 void agregarItemJugador(Map*mapaJugadores, Map *mapaItems) {
   ItemMapa *itemMNodo;
   Jugador *jugadorBuscado = existeJugador(mapaJugadores);
@@ -266,7 +264,9 @@ void agregarItemJugador(Map*mapaJugadores, Map *mapaItems) {
     printf("\nITEM INGRESADO CON ÉXITO\n");
 
     insertarAccion(jugadorBuscado->pilaAcciones, "agregar", nombreItem);
-    //busca si existe el item en el mapaItems, si no está crea la lista para ese item. Si no, se traspasa el item buscado a la itemMnodo
+    
+    /*busca si existe el item en el mapaItems, si no está crea la lista para ese item. 
+    Si no, se traspasa el item buscado a la itemMnodo*/
     ItemMapa *itemBuscado = searchMap(mapaItems, nombreItem);
   
     if(itemBuscado == NULL) {
@@ -278,7 +278,9 @@ void agregarItemJugador(Map*mapaJugadores, Map *mapaItems) {
 
       //Se verifica que el jugador tenga el item en su inventario
       Item*itemBuscado = buscarItem(jugadorBuscado->inventario, nombreItem);
-      //Si existe se verifica de que el jugador no exista en la lista de jugadores del mapa de items. Si ya existe, no se hace nada, si no, se agrega el jugador a la lista de jugadores del mapa del item.
+      
+      /*Si existe se verifica de que el jugador no exista en la lista de jugadores del mapa de items. 
+      Si ya existe, no se hace nada, si no, se agrega el jugador a la lista de jugadores del mapa del item.*/
       if(itemBuscado != NULL) {
         if(existeJugadorLista(itemMNodo->listaJugadoresConItem, jugadorBuscado->nombre)) {
           return;
@@ -286,11 +288,9 @@ void agregarItemJugador(Map*mapaJugadores, Map *mapaItems) {
 
         pushBack(itemMNodo->listaJugadoresConItem, jugadorBuscado);
         return;
-        
       }
-      
     }
-    //Se le traspasa el nombreItem al itemMNodo y luego se
+
     strcpy(itemMNodo->nombre, nombreItem);
     //En el caso de que no existiera el item en el mapa de items, se agrega el item al mapa de items.
     insertarItemMapa(jugadorBuscado, nombreItem, mapaItems, itemMNodo);
@@ -304,10 +304,10 @@ void insertarAccion(Stack*pilaAcciones, char*accion, char*nombreItem) {
   strcpy(nodoAccion->item, nombreItem);
 
   stack_push(pilaAcciones, nodoAccion);
-
 }
 
-//Para eliminar el item en el perfil del jugador, le pasamos el Mapa de jugadores y el Mapa de items, para después preguntar si el item existe en el inventario del jugador buscado o no
+/*Para eliminar el item en el perfil del jugador, le pasamos el Mapa de jugadores y el Mapa de items, 
+para después preguntar si el item existe en el inventario del jugador buscado o no.*/
 void eliminarItemJugador(Map *mapaJugadores) {
   char nombreItem[51];
 
@@ -320,7 +320,9 @@ void eliminarItemJugador(Map *mapaJugadores) {
 
   Item* itemNodo = buscarItem(jugadorBuscado->inventario, nombreItem);
 
-  //Si el nodo del Item es igual a null, significa que el item no se encuentra en el inventario, y si existe se inserta la accion en la pila de acciones y se elimina el item de la lista de items del jugador
+  /*Si el nodo del Item es igual a null, significa que el item no se 
+  encuentra en el inventario, y si existe se inserta la accion en la pila de acciones 
+  y se elimina el item de la lista de items del jugador*/
   if (itemNodo == NULL) {
     printf("\nEl item no existe en el inventario del jugador");
   } else {
@@ -353,11 +355,12 @@ void agregarPuntosJugador(Map*mapaJugadores) {
    do {
      scanf("%20[^\n]s", puntosAIngresarString);
      getchar();
-//Se verifica que los puntos a ingresar sea número, sino se transforma a este
+     //Se verifica que los puntos a ingresar sea número, sino se transforma a este
      if(isdigit(puntosAIngresarString[0])) {
        puntosAIngresar = atoi(puntosAIngresarString);
      } 
-//Si se verifica que los puntos a ingresar es negativo o tipo alfa se manda un mensaje para que se ingrese un puntaje válido.
+      /*Si se verifica que los puntos a ingresar es negativo o tipo alfa se manda un mensaje 
+      para que se ingrese un puntaje válido*/
       if (puntosAIngresar <= 0 || isalpha(puntosAIngresarString[0])) {
         printf("INGRESE UN PUNTAJE VÁLIDO ");
       } 
