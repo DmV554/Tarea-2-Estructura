@@ -44,6 +44,7 @@ bool existeJugadorLista(List *, char *);
 void eliminarJugadorListaItemMapa(Jugador*,char*, Map*);
 void eliminarJugadorLista(List *, char *);
 void insertarItemMapa(Jugador*, char*, Map*, ItemMapa*);
+void deshacerUltimaAccion(Map*);
 
 /*
   función para comparar claves de tipo string
@@ -137,7 +138,7 @@ int main() {
         break;
 
       case 7:
-        
+        deshacerUltimaAccion(mapaJugadores);
         break;
 
       case 8:
@@ -442,3 +443,56 @@ void  insertarItemMapa(Jugador*jugadorBuscado, char*nombreItem, Map*mapaItems, I
   insertMap(mapaItems, itemM->nombre, itemM);
 }
 
+//Para deshacer la ultima accion se traspasa el mapaJugadores y se verifica que el jugador exista. Luego creamos un puntero que apunte al top de la pila de acciones (o sea, la ultima accion realizada). Si la ultima accion es null, significa que no se han realizado acciones aún o ya se borraron todas.
+void deshacerUltimaAccion(Map*mapaJugadores) {
+  Jugador*jugadorBuscado = existeJugador(mapaJugadores);
+  if(jugadorBuscado == NULL) return;
+
+  Accion *ultimaAccion = stack_top(jugadorBuscado->pilaAcciones);
+
+  if(ultimaAccion == NULL) {
+    printf("NO HAY ACCIONES REALIZADAS POR EL JUGADOR\n");
+    return;
+  }
+
+  //Si la ultima accion fue "agregar" significa que para deshacer necesitamos eliminar el último dato ingresado. Por lo tanto creamos un puntero que apunte al ultimo item agregado.
+  if(strcmp(ultimaAccion->nombreAccion, "agregar") == 0) {
+     Item* itemNodo = buscarItem(jugadorBuscado->inventario, ultimaAccion->item);
+
+    //Si el nodo es NULL significa que el item no esta en la lista del jugador, sino, eliminamos el último item ingresado del jugador.
+     if (itemNodo == NULL) {
+      printf("\nEl item no existe en el inventario del jugador");
+      } else {
+       popCurrent(jugadorBuscado->inventario);
+       printf("ACCION DESHECHA CON EXITO\n\n");
+      }
+
+    //Finalmente, se elimina la ultima acción que sería "agregar" ya que el usuario la deshizo.
+      stack_pop(jugadorBuscado->pilaAcciones);
+  }
+
+  //En el caso de que la ultima accion sea eliminar, significa que debemos agregar el ultimo item eliminado. Por lo tanto reservamos memoria para el nodo a agregar.
+  if(strcmp(ultimaAccion->nombreAccion, "eliminar") == 0) {
+    Item *itemNodo = malloc(sizeof(Item));
+    if(itemNodo == NULL) exit(EXIT_FAILURE);
+
+    //Copiamos el item que se eliminó al itemNodo y lo agregamos al final de la lista de inventario del jugador
+    strcpy(itemNodo->nombre, ultimaAccion->item);
+    pushBack(jugadorBuscado->inventario, itemNodo);
+    printf("ACCION DESHECHA CON EXITO\n\n");
+
+    //Se elimina la última accion guardada en la pila de acciones ya que el usuario la deshizo.
+    stack_pop(jugadorBuscado->pilaAcciones);
+  }
+
+  //Si la ultima accion es agregar puntaje, significa que debemos restar el puntaje agregado al puntaje total. 
+  if(strcmp(ultimaAccion->nombreAccion, "agregar puntaje") == 0) {
+
+    jugadorBuscado->puntosHabilidad -= ultimaAccion->puntajeADeshacer;
+    
+    printf("ACCION DESHECHA CON EXITO\n\n");
+    
+    stack_pop(jugadorBuscado->pilaAcciones);
+  }
+
+}
