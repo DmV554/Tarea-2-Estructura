@@ -45,6 +45,7 @@ void eliminarJugadorListaItemMapa(Jugador*,char*, Map*);
 void eliminarJugadorLista(List *, char *);
 void insertarItemMapa(Jugador*, char*, Map*, ItemMapa*);
 void deshacerUltimaAccion(Map*);
+void exportarDatosJugadores(Map*);
 
 /*
   función para comparar claves de tipo string
@@ -142,7 +143,7 @@ int main() {
         break;
 
       case 8:
-
+        exportarDatosJugadores(mapaJugadores);
         break;
 
       case 9:
@@ -495,4 +496,41 @@ void deshacerUltimaAccion(Map*mapaJugadores) {
     stack_pop(jugadorBuscado->pilaAcciones);
   }
 
+}
+
+
+//Al momento de querer exportar los datos ya creados, a la función se le pasa el Mapa de Jugadores, se verifica primeramente si este es NULL, si lo es, este sale de la función sin hacer unn archivo vacio. Si esto no sucede, la función procede normalmente, creando una variable FILE a la cual se le otorga el nombre del archivo preguntado anteriormente, posteriormente se crea una variable tipo Jugador a la cual se le otorga el primer Mapa del mapaJugadores y se van printeando cada una de las cosas dentro del perfil de los jugadores, hasta que el nodo sea NULO, lo que termina el ciclo while, después se cierra el archivo y se hace un print diciendo que todos los datos se exportaron correctamente
+void exportarDatosJugadores(Map*mapaJugadores) {
+  if(mapaJugadores == NULL) exit(EXIT_FAILURE);
+  char nombreArchivo[101];
+
+  printf("\nINGRESE NOMBRE DEL ARCHIVO A EXPORTAR LOS JUGADORES:\n");
+  scanf("%100[^\n]s", nombreArchivo);
+
+  FILE* archivoJugadores = fopen(nombreArchivo, "w");
+  
+  if (archivoJugadores == NULL) {
+      printf("Error al abrir el archivo\n");
+      return;
+  }
+
+   Jugador *jugadorNodo = firstMap(mapaJugadores);
+
+   fprintf(archivoJugadores, "Nombre,Puntos de habilidad,Items\n");
+  
+  while(jugadorNodo != NULL) {
+    fprintf(archivoJugadores, "%s, %d", jugadorNodo->nombre, jugadorNodo->puntosHabilidad);
+
+    Item*itemNodo = firstList(jugadorNodo->inventario);
+
+    while(itemNodo != NULL) {
+      fprintf(archivoJugadores, " ,%s", itemNodo->nombre);
+      itemNodo = nextList(jugadorNodo->inventario);
+    }
+    fprintf(archivoJugadores, "\n");
+    jugadorNodo = nextMap(mapaJugadores);
+  }
+
+  fclose(archivoJugadores);
+  printf("\nLOS DATOS SE HAN EXPORTADO CORRECTAMENTE AL ARCHIVO\n: %s\n", nombreArchivo);
 }
