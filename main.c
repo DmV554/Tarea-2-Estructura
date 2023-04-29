@@ -40,6 +40,9 @@ Item *buscarItem(List *, char *);
 void agregarPuntosJugador(Map*);
 void insertarAccionPuntaje(Stack*, char*, int);
 void mostrarJugadoresItemEspecifico(Map*);
+bool existeJugadorLista(List *, char *);
+void eliminarJugadorListaItemMapa(Jugador*,char*, Map*);
+void eliminarJugadorLista(List *, char *);
 
 /*
   función para comparar claves de tipo string
@@ -230,6 +233,7 @@ Jugador* existeJugador(Map*mapaJugadores) {
   
 }
 
+
 void agregarItemJugador(Map*mapaJugadores, Map *mapaItems) {
   ItemMapa *itemMNodo;
   Jugador *jugadorBuscado = existeJugador(mapaJugadores);
@@ -396,3 +400,36 @@ void mostrarJugadoresItemEspecifico(Map*mapaItems) {
   }
 }
 
+//Para buscar si existe el jugador simplemente se agrega un puntero al inicio de la lista, si se encuentra el jugador se retorna true, si no, false.
+bool existeJugadorLista(List * listaJugadoresItem, char *nombreJugador){
+  Jugador *jugadorBuscado = firstList(listaJugadoresItem);
+  
+  while (jugadorBuscado != NULL) {
+    if (strcmp(jugadorBuscado->nombre, nombreJugador) == 0) {
+      return true;
+    }
+    jugadorBuscado = nextList(listaJugadoresItem);
+  }
+  
+  return false;
+}
+
+//Para eliminar un jugador de una lista de jugadores de un mapa de item especifico, primero se busca el mapa del item y se traspasa la lista de jugadores junto con el nombre de jugador a eliminar a la funcion eliminarJugador.
+void eliminarJugadorListaItemMapa(Jugador*jugadorBuscado, char*nombreItem, Map*mapaItems) {
+  ItemMapa*itemMNodo = searchMap(mapaItems, nombreItem);
+
+  eliminarJugadorLista(itemMNodo->listaJugadoresConItem,jugadorBuscado->nombre);
+}
+
+
+//Para eliminar el jugador de la lista de jugadores de un mapa de item especifico, se recorre la lista hasta encontrarlo y se realiza un popCurrent.
+void eliminarJugadorLista(List *listaJugadores, char *nombreJugador) {
+  Jugador *jugadorNodo = firstList(listaJugadores);
+  
+  while (jugadorNodo != NULL) {
+    if (strcmp(jugadorNodo->nombre, nombreJugador) == 0) {
+      popCurrent(listaJugadores);
+    }
+    jugadorNodo = nextList(listaJugadores);
+  }
+}
