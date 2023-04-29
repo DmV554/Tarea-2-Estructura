@@ -37,6 +37,8 @@ Jugador* existeJugador(Map*);
 void insertarAccion(Stack*, char*, char*);
 void eliminarItemJugador(Map *);
 Item *buscarItem(List *, char *);
+void agregarPuntosJugador(Map*);
+void insertarAccionPuntaje(Stack*, char*, int);
 
 /*
   función para comparar claves de tipo string
@@ -121,7 +123,7 @@ int main() {
         break;
 
       case 5:
-     
+        agregarPuntosJugador(mapaJugadores);
         break;
 
       case 6:
@@ -290,4 +292,46 @@ Item *buscarItem(List *inventario, char *nombreItem) {
     item = nextList(inventario);
   }
   return NULL;
+}
+
+//Para agregar puntos de jugador se inicializa los puntosAIngresar en -1. 
+void agregarPuntosJugador(Map*mapaJugadores) {
+  char puntosAIngresarString[21];
+  int puntosAIngresar = -1;
+
+  Jugador*jugadorBuscado = existeJugador(mapaJugadores);
+  if(jugadorBuscado == NULL) return;
+
+  printf("INGRESE PUNTOS DE HABILIDAD JUGADOR: ");
+   do {
+     scanf("%20[^\n]s", puntosAIngresarString);
+     getchar();
+//Se verifica que los puntos a ingresar sea número, sino se transforma a este
+     if(isdigit(puntosAIngresarString[0])) {
+       puntosAIngresar = atoi(puntosAIngresarString);
+     } 
+//Si se verifica que los puntos a ingresar es negativo o tipo alfa se manda un mensaje para que se ingrese un puntaje válido.
+      if (puntosAIngresar <= 0 || isalpha(puntosAIngresarString[0])) {
+        printf("INGRESE UN PUNTAJE VÁLIDO ");
+      } 
+
+     //Se repite el ciclo hasta que se ingrese un valor válido
+    } while (isalpha(puntosAIngresarString[0]) || puntosAIngresar <=0);
+
+  //Cuando se verifica que los puntos sean válidos, se le suman a los puntos del jugador
+  jugadorBuscado->puntosHabilidad += puntosAIngresar;
+
+  //Se traspasa la pila de acciones del jugador, la accion y los puntos ingresados.
+  insertarAccionPuntaje(jugadorBuscado->pilaAcciones, "agregar puntaje", puntosAIngresar);
+  printf("\nPUNTAJE ASIGNADO CORECTAMENTE\n");
+}
+
+//Se traspasa la pila de acciones junto con la accion y el puntaje a guardar como la ultima accion para poder eliminarla en el caso de que el usuario lo requiera. Luego se inserta el nodo accion a la pila de acciones.
+void insertarAccionPuntaje(Stack*pilaAcciones, char*accion, int puntaje) {
+  Accion*nodoAccion = malloc(sizeof(Accion));
+
+  nodoAccion->puntajeADeshacer = puntaje;
+  strcpy(nodoAccion->nombreAccion, accion);
+  
+  stack_push(pilaAcciones, nodoAccion);
 }
