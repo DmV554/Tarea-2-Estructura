@@ -43,6 +43,7 @@ void mostrarJugadoresItemEspecifico(Map*);
 bool existeJugadorLista(List *, char *);
 void eliminarJugadorListaItemMapa(Jugador*,char*, Map*);
 void eliminarJugadorLista(List *, char *);
+void insertarItemMapa(Jugador*, char*, Map*, ItemMapa*);
 
 /*
   función para comparar claves de tipo string
@@ -433,3 +434,11 @@ void eliminarJugadorLista(List *listaJugadores, char *nombreJugador) {
     jugadorNodo = nextList(listaJugadores);
   }
 }
+
+//Se agrega el jugador a la lista de jugadores del mapa del item correspondiente.
+void  insertarItemMapa(Jugador*jugadorBuscado, char*nombreItem, Map*mapaItems, ItemMapa* itemM) {
+  
+  pushBack(itemM->listaJugadoresConItem, jugadorBuscado);
+  insertMap(mapaItems, itemM->nombre, itemM);
+}
+
