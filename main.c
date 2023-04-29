@@ -35,6 +35,9 @@ void mostrarInventario(List *);
 void agregarItemJugador(Map*);
 Jugador* existeJugador(Map*);
 void insertarAccion(Stack*, char*, char*);
+void eliminarItemJugador(Map *);
+Item *buscarItem(List *, char *);
+
 /*
   función para comparar claves de tipo string
   retorna 1 si son iguales
@@ -114,7 +117,7 @@ int main() {
         break;
 
       case 4:
-        
+        eliminarItemJugador(mapaJugadores);
         break;
 
       case 5:
@@ -253,4 +256,38 @@ void insertarAccion(Stack*pilaAcciones, char*accion, char*nombreItem) {
 
   stack_push(pilaAcciones, nodoAccion);
 
+}
+
+//Para eliminar el item en el perfil del jugador, le pasamos el Mapa de jugadores y el Mapa de items, para después preguntar si el item existe en el inventario del jugador buscado o no
+void eliminarItemJugador(Map *mapaJugadores) {
+  char nombreItem[51];
+
+  Jugador*jugadorBuscado = existeJugador(mapaJugadores);
+  if(jugadorBuscado == NULL) return;
+  
+  printf("\nINGRESE ITEM A ELIMINAR: ");
+  scanf("%50[^\n]s", nombreItem);
+  getchar();
+
+  Item* itemNodo = buscarItem(jugadorBuscado->inventario, nombreItem);
+
+  //Si el nodo del Item es igual a null, significa que el item no se encuentra en el inventario, y si existe se inserta la accion en la pila de acciones y se elimina el item de la lista de items del jugador
+  if (itemNodo == NULL) {
+    printf("\nEl item no existe en el inventario del jugador");
+  } else {
+    insertarAccion(jugadorBuscado->pilaAcciones, "eliminar", nombreItem);
+    popCurrent(jugadorBuscado->inventario);
+  }
+}
+
+Item *buscarItem(List *inventario, char *nombreItem) {
+  Item *item = firstList(inventario);
+  
+  while (item != NULL) {
+    if (strcmp(item->nombre, nombreItem) == 0) {
+      return item;
+    }
+    item = nextList(inventario);
+  }
+  return NULL;
 }
