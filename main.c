@@ -168,6 +168,10 @@ int main() {
     return 0;
 }
 
+
+/*Para crear el perfil de jugador se verifica de que no exista en el mapa. 
+Luego se inicializa la variable puntos de habilidad en 0, se crea la lista del inventario y 
+la pila de acciones. Luego se agrega el jugador al mapa de jugadores*/
 void crearPerfil(Map *mapaJugadores, Jugador* jugador) {
   printf("INGRESE NOMBRE JUGADOR A CREAR: ");
   scanf("%50[^\n]s", jugador->nombre);
@@ -237,7 +241,11 @@ Jugador* existeJugador(Map*mapaJugadores) {
   
 }
 
-
+/*Para agregar el item al jugador se le traspasa el mapa de jugadores y el mapa de items. 
+Se verifica de que el jugador exista, se le reserva memoria al nodo del item nuevo y se copia 
+el nombreItem al nodo del item nodo. Luego se agrega al final de la lista del inventario del jugador
+ el nodo del item agregado. Luego guardamos en la pila de acciones "agregar" ya que es la acción que
+  se acaba de realizar.*/
 void agregarItemJugador(Map*mapaJugadores, Map *mapaItems) {
   ItemMapa *itemMNodo;
   Jugador *jugadorBuscado = existeJugador(mapaJugadores);
@@ -439,13 +447,15 @@ void eliminarJugadorLista(List *listaJugadores, char *nombreJugador) {
 }
 
 //Se agrega el jugador a la lista de jugadores del mapa del item correspondiente.
-void  insertarItemMapa(Jugador*jugadorBuscado, char*nombreItem, Map*mapaItems, ItemMapa* itemM) {
+void insertarItemMapa(Jugador*jugadorBuscado, char*nombreItem, Map*mapaItems, ItemMapa* itemM) {
   
   pushBack(itemM->listaJugadoresConItem, jugadorBuscado);
   insertMap(mapaItems, itemM->nombre, itemM);
 }
 
-//Para deshacer la ultima accion se traspasa el mapaJugadores y se verifica que el jugador exista. Luego creamos un puntero que apunte al top de la pila de acciones (o sea, la ultima accion realizada). Si la ultima accion es null, significa que no se han realizado acciones aún o ya se borraron todas.
+/*Para deshacer la ultima accion se traspasa el mapaJugadores y se verifica que el jugador exista.
+ Luego creamos un puntero que apunte al top de la pila de acciones (o sea, la ultima accion realizada).
+  Si la ultima accion es null, significa que no se han realizado acciones aún o ya se borraron todas.*/
 void deshacerUltimaAccion(Map*mapaJugadores) {
   Jugador*jugadorBuscado = existeJugador(mapaJugadores);
   if(jugadorBuscado == NULL) return;
@@ -500,7 +510,13 @@ void deshacerUltimaAccion(Map*mapaJugadores) {
 }
 
 
-//Al momento de querer exportar los datos ya creados, a la función se le pasa el Mapa de Jugadores, se verifica primeramente si este es NULL, si lo es, este sale de la función sin hacer unn archivo vacio. Si esto no sucede, la función procede normalmente, creando una variable FILE a la cual se le otorga el nombre del archivo preguntado anteriormente, posteriormente se crea una variable tipo Jugador a la cual se le otorga el primer Mapa del mapaJugadores y se van printeando cada una de las cosas dentro del perfil de los jugadores, hasta que el nodo sea NULO, lo que termina el ciclo while, después se cierra el archivo y se hace un print diciendo que todos los datos se exportaron correctamente
+/*Al momento de querer exportar los datos ya creados, a la función se le pasa el Mapa de Jugadores,
+ se verifica primeramente si este es NULL, si lo es, este sale de la función sin hacer unn archivo vacio.
+  Si esto no sucede, la función procede normalmente, creando una variable FILE a la cual se le otorga el
+   nombre del archivo preguntado anteriormente, posteriormente se crea una variable tipo Jugador a la 
+   cual se le otorga el primer Mapa del mapaJugadores y se van printeando cada una de las cosas dentro 
+   del perfil de los jugadores, hasta que el nodo sea NULO, lo que termina el ciclo while, después se 
+   cierra el archivo y se hace un print diciendo que todos los datos se exportaron correctamente*/
 void exportarDatosJugadores(Map*mapaJugadores) {
   if(mapaJugadores == NULL) exit(EXIT_FAILURE);
   char nombreArchivo[101];
@@ -536,7 +552,31 @@ void exportarDatosJugadores(Map*mapaJugadores) {
   printf("\nLOS DATOS SE HAN EXPORTADO CORRECTAMENTE AL ARCHIVO\n: %s\n", nombreArchivo);
 }
 
-//En esta función se recibe el mapa con todos los jugadores y el mapa con todos los items. Se crea una variable tipo char donde se guardará el nombre del archivo que el usuario desea ingresar, luego se abre el archivo mediante el uso de la funcion "fopen", en modo de lectura, "r", y se verifica que el archivo solicitado se abrio sin problemas, en caso contrario se imprime el mensaje correspondiente y se termina la ejecucion de la funcion, si no, se crea otra variable tipo char donde se guardaran las lineas del archivo a importar, entrando a un ciclo while condicionado por la funcion fgets, la cual por los parametros lineaArchivo, sizeof(lineaArchivo) y el archivo correspondiente, se encarga de que se lea linea por linea hasta que se llegue al final del archivo. Se crea un auxiliar tipo Jugador que se le reserva memoria. Mediante el uso de la funcion "strtok", se divide la linea de archivo leida en campos separados por comas (","), siendo su primera llamada cuando se quiere ingresar el nombre del jugador respectivo. En un principio para poder ingresar el nombre, se lee la linea completa hasta la coma, (donde su primer argumento es la lineaArchivo), pero para los siguientes datos el primer argumento cambia a NULL ya que de esta manera se sigue dividiendo la cadena desde la llamada anterior de la función. Para el nombre, este se guarda gracias a la funcion strcopy, luego para los puntos de habilidad se guardan en un auxiliar como string, se transforma a entero por el uso de la funcion atoi y se termina guardando en el juadorNodo, se crea la pila para el jugadorNodo, se guarda la cantidad de items como tipo char yse crea la lista para el inventario de items del jugador. Para los items, se lee el primer item del jugador del archivo, y se entra a un ciclo while el cual este termina en caso de que el item leido sea NULL (ya no quedan mas items del jugador respectivo). Dentro del ciclo se crea una variable tipo Item como un nodo auxiliar la cual se le reserva memoria, el item que se leyo anteriormente se guarda dentro del nodo auxiliar, y se ingresa el nodo dentro de la lista de items del jugador mediante pushFront y se llama a la funcion insertarItemMapaArchivo, para añadir el item al mapa de items.
+/*En esta función se recibe el mapa con todos los jugadores y el mapa con todos los items.
+ Se crea una variable tipo char donde se guardará el nombre del archivo que el usuario desea 
+ ingresar, luego se abre el archivo mediante el uso de la funcion "fopen", en modo de lectura,
+  "r", y se verifica que el archivo solicitado se abrio sin problemas, en caso contrario se imprime
+   el mensaje correspondiente y se termina la ejecucion de la funcion, si no, se crea otra variable 
+   tipo char donde se guardaran las lineas del archivo a importar, entrando a un ciclo while condicionado
+    por la funcion fgets, la cual por los parametros lineaArchivo, sizeof(lineaArchivo) y el 
+    archivo correspondiente, se encarga de que se lea linea por linea hasta que se llegue al 
+    final del archivo. Se crea un auxiliar tipo Jugador que se le reserva memoria. 
+    Mediante el uso de la funcion "strtok", se divide la linea de archivo leida en campos separados 
+    por comas (","), siendo su primera llamada cuando se quiere ingresar el nombre del jugador respectivo.
+     En un principio para poder ingresar el nombre, se lee la linea completa hasta la coma, 
+     (donde su primer argumento es la lineaArchivo), pero para los siguientes datos el primer 
+     argumento cambia a NULL ya que de esta manera se sigue dividiendo la cadena desde la llamada 
+     anterior de la función. Para el nombre, este se guarda gracias a la funcion strcopy, 
+     luego para los puntos de habilidad se guardan en un auxiliar como string, se transforma a
+      entero por el uso de la funcion atoi y se termina guardando en el juadorNodo, se crea la 
+      pila para el jugadorNodo, se guarda la cantidad de items como tipo char yse crea la lista 
+      para el inventario de items del jugador. Para los items, se lee el primer item del jugador
+       del archivo, y se entra a un ciclo while el cual este termina en caso de que el item leido 
+       sea NULL (ya no quedan mas items del jugador respectivo). Dentro del ciclo se crea una variable 
+       tipo Item como un nodo auxiliar la cual se le reserva memoria, el item que se leyo anteriormente s
+       e guarda dentro del nodo auxiliar, y se ingresa el nodo dentro de la lista de items del jugador 
+       mediante pushFront y se llama a la funcion insertarItemMapaArchivo, para añadir el item al mapa de 
+       items.*/
 void importarDatosJugadores(Map*mapaJugadores, Map*mapaItems) {
   char nombreArchivo[101];
 
