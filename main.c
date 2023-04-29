@@ -328,6 +328,7 @@ void eliminarItemJugador(Map *mapaJugadores, Map* mapaItems) {
   } else {
     insertarAccion(jugadorBuscado->pilaAcciones, "eliminar", nombreItem);
     popCurrent(jugadorBuscado->inventario);
+    printf("\nITEM ELIMINADO CON ÉXITO\n");
     eliminarJugadorListaItemMapa(jugadorBuscado, nombreItem, mapaItems);
   }
 }
