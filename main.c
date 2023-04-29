@@ -30,6 +30,8 @@ typedef struct {
 }Accion;
 
 void crearPerfil(Map *, Jugador*);
+void mostrarPerfilJugador(Map *);
+void mostrarInventario(List *);
 
 /*
   función para comparar claves de tipo string
@@ -102,7 +104,7 @@ int main() {
         break;
         
       case 2:
-        
+        mostrarPerfilJugador(mapaJugadores);
         break;
 
       case 3:  
@@ -170,4 +172,34 @@ void crearPerfil(Map *mapaJugadores, Jugador* jugador) {
   insertMap(mapaJugadores, jugador->nombre, jugador);
 
   printf("\nJUGADOR CREADO CON ÉXITO\n");
+}
+
+//Primero se comprueba si existe el jugador dentro del mapa de jugadores. Se muestra el nombre y los puntos de habilidad y luego se muestra el inventario a través de la función mostrar inventario
+void mostrarPerfilJugador(Map *mapaJugadores) {
+  Jugador* jugadorBuscado = existeJugador(mapaJugadores);
+
+  if(jugadorBuscado == NULL) return;
+  
+  printf("\nNombre Jugador: %s\n", jugadorBuscado->nombre);
+  printf("Puntos Jugador: %d\n", jugadorBuscado->puntosHabilidad);
+  
+  mostrarInventario(jugadorBuscado->inventario);
+  printf("\n\n");
+  
+
+}
+
+//Se crea un puntero al princio de la lista del inventario para comenzar la busqueda. Si es null significa que la lista está vacía. Si no, muestra la lista de todos los items recorriendo la lista.
+void mostrarInventario(List *inventario){
+  Item *itemNodo = firstList(inventario);
+
+  if(itemNodo == NULL ) {
+    printf("NO HAY ITEMS INGRESADOS\n");
+  } else {
+    printf("LISTA DE TODOS LOS ITEMS:\n");
+    while (itemNodo != NULL) {
+      printf("%s\n", itemNodo->nombre);
+      itemNodo = nextList(inventario);
+    }
+  }
 }
