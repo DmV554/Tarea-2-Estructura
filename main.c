@@ -353,21 +353,21 @@ void agregarPuntosJugador(Map*mapaJugadores) {
   if(jugadorBuscado == NULL) return;
 
   printf("INGRESE PUNTOS DE HABILIDAD JUGADOR: ");
-   do {
-     scanf("%20[^\n]s", puntosAIngresarString);
-     getchar();
-     //Se verifica que los puntos a ingresar sea número, sino se transforma a este
-     if(isdigit(puntosAIngresarString[0])) {
-       puntosAIngresar = atoi(puntosAIngresarString);
-     } 
-      /*Si se verifica que los puntos a ingresar es negativo o tipo alfa se manda un mensaje 
-      para que se ingrese un puntaje válido*/
-      if (puntosAIngresar <= 0 || isalpha(puntosAIngresarString[0])) {
-        printf("INGRESE UN PUNTAJE VÁLIDO ");
-      } 
+  do {
+    scanf("%20[^\n]s", puntosAIngresarString);
+    getchar();
+    //Se verifica que los puntos a ingresar sea número, sino se transforma a este
+    if(isdigit(puntosAIngresarString[0])) {
+      puntosAIngresar = atoi(puntosAIngresarString);
+    } 
+    /*Si se verifica que los puntos a ingresar es negativo o tipo alfa se manda un mensaje 
+    para que se ingrese un puntaje válido*/
+    if (puntosAIngresar <= 0 || isalpha(puntosAIngresarString[0])) {
+      printf("INGRESE UN PUNTAJE VÁLIDO ");
+    } 
 
-     //Se repite el ciclo hasta que se ingrese un valor válido
-    } while (isalpha(puntosAIngresarString[0]) || puntosAIngresar <=0);
+    //Se repite el ciclo hasta que se ingrese un valor válido
+  } while (isalpha(puntosAIngresarString[0]) || puntosAIngresar <=0);
 
   //Cuando se verifica que los puntos sean válidos, se le suman a los puntos del jugador
   jugadorBuscado->puntosHabilidad += puntosAIngresar;
@@ -473,18 +473,18 @@ void deshacerUltimaAccion(Map*mapaJugadores) {
 
   //Si la ultima accion fue "agregar" significa que para deshacer necesitamos eliminar el último dato ingresado. Por lo tanto creamos un puntero que apunte al ultimo item agregado.
   if(strcmp(ultimaAccion->nombreAccion, "agregar") == 0) {
-     Item* itemNodo = buscarItem(jugadorBuscado->inventario, ultimaAccion->item);
+    Item* itemNodo = buscarItem(jugadorBuscado->inventario, ultimaAccion->item);
 
     //Si el nodo es NULL significa que el item no esta en la lista del jugador, sino, eliminamos el último item ingresado del jugador.
-     if (itemNodo == NULL) {
+    if (itemNodo == NULL) {
       printf("\nEl item no existe en el inventario del jugador");
-      } else {
-       popCurrent(jugadorBuscado->inventario);
-       printf("ACCION DESHECHA CON EXITO\n\n");
-      }
+    } else {
+      popCurrent(jugadorBuscado->inventario);
+      printf("ACCION DESHECHA CON EXITO\n\n");
+    }
 
     //Finalmente, se elimina la ultima acción que sería "agregar" ya que el usuario la deshizo.
-      stack_pop(jugadorBuscado->pilaAcciones);
+    stack_pop(jugadorBuscado->pilaAcciones);
   }
 
   //En el caso de que la ultima accion sea eliminar, significa que debemos agregar el ultimo item eliminado. Por lo tanto reservamos memoria para el nodo a agregar.
@@ -505,9 +505,7 @@ void deshacerUltimaAccion(Map*mapaJugadores) {
   if(strcmp(ultimaAccion->nombreAccion, "agregar puntaje") == 0) {
 
     jugadorBuscado->puntosHabilidad -= ultimaAccion->puntajeADeshacer;
-    
     printf("ACCION DESHECHA CON EXITO\n\n");
-    
     stack_pop(jugadorBuscado->pilaAcciones);
   }
 
@@ -531,13 +529,13 @@ void exportarDatosJugadores(Map*mapaJugadores) {
   FILE* archivoJugadores = fopen(nombreArchivo, "w");
   
   if (archivoJugadores == NULL) {
-      printf("Error al abrir el archivo\n");
-      return;
+    printf("Error al abrir el archivo\n");
+    return;
   }
 
-   Jugador *jugadorNodo = firstMap(mapaJugadores);
+  Jugador *jugadorNodo = firstMap(mapaJugadores);
 
-   fprintf(archivoJugadores, "Nombre,Puntos de habilidad,Items\n");
+  fprintf(archivoJugadores, "Nombre,Puntos de habilidad,Items\n");
   
   while(jugadorNodo != NULL) {
     fprintf(archivoJugadores, "%s, %d", jugadorNodo->nombre, jugadorNodo->puntosHabilidad);
@@ -557,30 +555,29 @@ void exportarDatosJugadores(Map*mapaJugadores) {
 }
 
 /*En esta función se recibe el mapa con todos los jugadores y el mapa con todos los items.
- Se crea una variable tipo char donde se guardará el nombre del archivo que el usuario desea 
- ingresar, luego se abre el archivo mediante el uso de la funcion "fopen", en modo de lectura,
-  "r", y se verifica que el archivo solicitado se abrio sin problemas, en caso contrario se imprime
-   el mensaje correspondiente y se termina la ejecucion de la funcion, si no, se crea otra variable 
-   tipo char donde se guardaran las lineas del archivo a importar, entrando a un ciclo while condicionado
-    por la funcion fgets, la cual por los parametros lineaArchivo, sizeof(lineaArchivo) y el 
-    archivo correspondiente, se encarga de que se lea linea por linea hasta que se llegue al 
-    final del archivo. Se crea un auxiliar tipo Jugador que se le reserva memoria. 
-    Mediante el uso de la funcion "strtok", se divide la linea de archivo leida en campos separados 
-    por comas (","), siendo su primera llamada cuando se quiere ingresar el nombre del jugador respectivo.
-     En un principio para poder ingresar el nombre, se lee la linea completa hasta la coma, 
-     (donde su primer argumento es la lineaArchivo), pero para los siguientes datos el primer 
-     argumento cambia a NULL ya que de esta manera se sigue dividiendo la cadena desde la llamada 
-     anterior de la función. Para el nombre, este se guarda gracias a la funcion strcopy, 
-     luego para los puntos de habilidad se guardan en un auxiliar como string, se transforma a
-      entero por el uso de la funcion atoi y se termina guardando en el juadorNodo, se crea la 
-      pila para el jugadorNodo, se guarda la cantidad de items como tipo char yse crea la lista 
-      para el inventario de items del jugador. Para los items, se lee el primer item del jugador
-       del archivo, y se entra a un ciclo while el cual este termina en caso de que el item leido 
-       sea NULL (ya no quedan mas items del jugador respectivo). Dentro del ciclo se crea una variable 
-       tipo Item como un nodo auxiliar la cual se le reserva memoria, el item que se leyo anteriormente s
-       e guarda dentro del nodo auxiliar, y se ingresa el nodo dentro de la lista de items del jugador 
-       mediante pushFront y se llama a la funcion insertarItemMapaArchivo, para añadir el item al mapa de 
-       items.*/
+Se crea una variable tipo char donde se guardará el nombre del archivo que el usuario desea 
+ingresar, luego se abre el archivo mediante el uso de la funcion "fopen", en modo de lectura,
+"r", y se verifica que el archivo solicitado se abrio sin problemas, en caso contrario se imprime
+el mensaje correspondiente y se termina la ejecucion de la funcion, si no, se crea otra variable 
+tipo char donde se guardaran las lineas del archivo a importar, entrando a un ciclo while condicionado
+por la funcion fgets, la cual por los parametros lineaArchivo, sizeof(lineaArchivo) y el 
+archivo correspondiente, se encarga de que se lea linea por linea hasta que se llegue al 
+final del archivo. Se crea un auxiliar tipo Jugador que se le reserva memoria. 
+Mediante el uso de la funcion "strtok", se divide la linea de archivo leida en campos separados 
+por comas (","), siendo su primera llamada cuando se quiere ingresar el nombre del jugador respectivo.
+En un principio para poder ingresar el nombre, se lee la linea completa hasta la coma, 
+(donde su primer argumento es la lineaArchivo), pero para los siguientes datos el primer 
+argumento cambia a NULL ya que de esta manera se sigue dividiendo la cadena desde la llamada 
+anterior de la función. Para el nombre, este se guarda gracias a la funcion strcopy, 
+luego para los puntos de habilidad se guardan en un auxiliar como string, se transforma a
+entero por el uso de la funcion atoi y se termina guardando en el juadorNodo, se crea la 
+pila para el jugadorNodo, se guarda la cantidad de items como tipo char yse crea la lista 
+para el inventario de items del jugador. Para los items, se lee el primer item del jugador
+del archivo, y se entra a un ciclo while el cual este termina en caso de que el item leido 
+sea NULL (ya no quedan mas items del jugador respectivo). Dentro del ciclo se crea una variable 
+tipo Item como un nodo auxiliar la cual se le reserva memoria, el item que se leyo anteriormente s
+e guarda dentro del nodo auxiliar, y se ingresa el nodo dentro de la lista de items del jugador 
+mediante pushFront y se llama a la funcion insertarItemMapaArchivo, para añadir el item al mapa de items.*/
 void importarDatosJugadores(Map*mapaJugadores, Map*mapaItems) {
   char nombreArchivo[101];
 
@@ -590,11 +587,11 @@ void importarDatosJugadores(Map*mapaJugadores, Map*mapaItems) {
   FILE* archivoJugadores = fopen(nombreArchivo, "r");
   
   if (archivoJugadores == NULL) {
-      printf("Error al abrir el archivo\n");
-      return;
+    printf("Error al abrir el archivo\n");
+    return;
   }
 
-   char lineaArchivo[200];
+  char lineaArchivo[200];
   while (fgets(lineaArchivo, sizeof(lineaArchivo), archivoJugadores)) {
     Jugador *jugadorNodo = malloc(sizeof(Jugador));
 
@@ -615,18 +612,18 @@ void importarDatosJugadores(Map*mapaJugadores, Map*mapaItems) {
 
     jugadorNodo->inventario = createList();
       
-      while(item != NULL) {
-        Item* ItemNodo = (Item*) malloc(sizeof(Item));
-        if(ItemNodo == NULL) exit(EXIT_FAILURE);
+    while(item != NULL) {
+      Item* ItemNodo = (Item*) malloc(sizeof(Item));
+      if(ItemNodo == NULL) exit(EXIT_FAILURE);
         
-        strcpy(ItemNodo->nombre, item);
+      strcpy(ItemNodo->nombre, item);
 
-        pushBack(jugadorNodo->inventario, ItemNodo);
+      pushBack(jugadorNodo->inventario, ItemNodo);
 
-        insertarItemMapaArchivo(mapaItems, item, jugadorNodo);
+      insertarItemMapaArchivo(mapaItems, item, jugadorNodo);
         
-        item = strtok(NULL, ",");
-      }
+      item = strtok(NULL, ",");
+    }
 
     insertMap(mapaJugadores, jugadorNodo->nombre, jugadorNodo);
   }
@@ -641,27 +638,25 @@ void insertarItemMapaArchivo(Map* mapaItems, char*nombreItem, Jugador*jugadorBus
   
   ItemMapa *itemBuscado = searchMap(mapaItems, nombreItem);
   
-    if(itemBuscado == NULL) {
-      itemMNodo = (ItemMapa*)malloc(sizeof(ItemMapa));      
-      itemMNodo->listaJugadoresConItem = createList();
+  if(itemBuscado == NULL) {
+    itemMNodo = (ItemMapa*)malloc(sizeof(ItemMapa));      
+    itemMNodo->listaJugadoresConItem = createList();
       
-    } else {
-      itemMNodo = itemBuscado;
+  } else {
+    itemMNodo = itemBuscado;
 
-      Item*itemBuscado = buscarItem(jugadorBuscado->inventario, nombreItem);
-      if(itemBuscado != NULL) {
+    Item*itemBuscado = buscarItem(jugadorBuscado->inventario, nombreItem);
+    if(itemBuscado != NULL) {
         
-        if(existeJugadorLista(itemMNodo->listaJugadoresConItem, jugadorBuscado->nombre)) {
-          return;
-        }
-
-        pushBack(itemMNodo->listaJugadoresConItem, jugadorBuscado);
+      if(existeJugadorLista(itemMNodo->listaJugadoresConItem, jugadorBuscado->nombre)) {
         return;
-        
       }
-      
+
+      pushBack(itemMNodo->listaJugadoresConItem, jugadorBuscado);
+      return; 
+      } 
     }
 
-    strcpy(itemMNodo->nombre, nombreItem);
-    insertarItemMapa(jugadorBuscado, nombreItem, mapaItems, itemMNodo);
+  strcpy(itemMNodo->nombre, nombreItem);
+  insertarItemMapa(jugadorBuscado, nombreItem, mapaItems, itemMNodo);
 }
