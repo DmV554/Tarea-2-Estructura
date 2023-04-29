@@ -39,6 +39,7 @@ void eliminarItemJugador(Map *);
 Item *buscarItem(List *, char *);
 void agregarPuntosJugador(Map*);
 void insertarAccionPuntaje(Stack*, char*, int);
+void mostrarJugadoresItemEspecifico(Map*);
 
 /*
   función para comparar claves de tipo string
@@ -83,6 +84,7 @@ int main() {
 
    Map *mapaJugadores = createMap(is_equal_string);
    Jugador *jugador;
+   Map *mapaItems = createMap(is_equal_string);
 
   while (ejecucion) {
     printf("\n1.-CREAR PERFIL JUGADOR\n");
@@ -127,7 +129,7 @@ int main() {
         break;
 
       case 6:
-
+        mostrarJugadoresItemEspecifico(mapaItems);
         break;
 
       case 7:
@@ -335,3 +337,33 @@ void insertarAccionPuntaje(Stack*pilaAcciones, char*accion, int puntaje) {
   
   stack_push(pilaAcciones, nodoAccion);
 }
+
+//Para mostrar los jugadores con item especificos se le traspasa el mapa de items. Se crea la variable nombreItem y luego se verifica de que el item ingresado exista en el mapa. 
+void mostrarJugadoresItemEspecifico(Map*mapaItems) {
+  char nombreItem[51];
+  
+  printf("\nINGRESE ITEM PARA MOSTRAR JUGADORES: ");
+  scanf("%50[^\n]s", nombreItem);
+  getchar();
+
+  ItemMapa *itemBuscado = searchMap(mapaItems, nombreItem);
+  if(itemBuscado == NULL) {
+    printf("NO EXISTE EL ITEM\n");
+    return;
+  }
+
+  //Si existe el item, se crea un puntero al inicio de la lista de jugadores del item para poder recorrerla
+  Jugador *jugadorNodo = firstList(itemBuscado->listaJugadoresConItem);
+
+  //Si el primer nodo de la lista es NULL, significa que no existen jugadores con ese item. Si no, se imprimen todos los jugadores con ese item.
+  if(jugadorNodo == NULL ) {
+    printf("NO HAY JUGADORES CON ESE ITEM\n");
+  } else {
+    printf("LISTA DE TODOS LOS JUGADORES CON ITEM ESPECIFICO:\n");
+    while (jugadorNodo != NULL) {
+      printf("%s\n", jugadorNodo->nombre);
+      jugadorNodo = nextList(itemBuscado->listaJugadoresConItem);
+    }
+  }
+}
+
