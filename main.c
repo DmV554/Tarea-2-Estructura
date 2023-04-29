@@ -29,6 +29,8 @@ typedef struct {
   int puntajeADeshacer;
 }Accion;
 
+void crearPerfil(Map *, Jugador*);
+
 /*
   función para comparar claves de tipo string
   retorna 1 si son iguales
@@ -70,6 +72,9 @@ int main() {
   char opcion[11];
   bool ejecucion = true;
 
+   Map *mapaJugadores = createMap(is_equal_string);
+   Jugador *jugador;
+
   while (ejecucion) {
     printf("\n1.-CREAR PERFIL JUGADOR\n");
     printf("2.-MOSTRAR PERFIL JUGADOR\n");
@@ -91,6 +96,8 @@ int main() {
 
       switch (opcionNumero) {
       case 1:
+        jugador = (Jugador*)malloc(sizeof(Jugador));
+        crearPerfil(mapaJugadores, jugador);
         
         break;
         
@@ -143,3 +150,24 @@ int main() {
     return 0;
 }
 
+void crearPerfil(Map *mapaJugadores, Jugador* jugador) {
+  printf("INGRESE NOMBRE JUGADOR A CREAR: ");
+  scanf("%50[^\n]s", jugador->nombre);
+  getchar();
+
+ Jugador* jugadorBuscado = searchMap(mapaJugadores, jugador->nombre);
+  if(jugadorBuscado != NULL) {
+    printf("\nEl jugador %s ya existe\n\n", jugador->nombre);
+    return;
+  }
+  
+
+  jugador->puntosHabilidad = 0;
+  
+  jugador->inventario = createList();
+  jugador->pilaAcciones = stack_create();
+  
+  insertMap(mapaJugadores, jugador->nombre, jugador);
+
+  printf("\nJUGADOR CREADO CON ÉXITO\n");
+}
